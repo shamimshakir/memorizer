@@ -1,21 +1,19 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+  import HomeViewVue from './HomeView.vue';
 </script>
 
 <template>
-  <header>
-    <div class="wrapper">
-      <!-- <HelloWorld msg="You did it!" /> -->
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+  <header class="bg-dark pt-3 pb-2 sticky-top">
+    <div class="container">
+      <div class="d-flex justify-content-center">
+        <h4 class="text-white">Memorizer</h4>
+      </div>
     </div>
   </header>
-
-  <RouterView />
+  <main>
+    <div class="container mt-4">
+      <HomeViewVue />
+    </div>
+  </main>
 </template>
 
-<style>
-@import '@/assets/base.css';
-</style>
