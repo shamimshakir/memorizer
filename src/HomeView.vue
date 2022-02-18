@@ -22,29 +22,10 @@
             v-model="colOnOff"
           />
           <label class="btn btn-sm btn-outline-primary" for="bangla">Bangla</label>
-          <input
-            type="checkbox"
-            class="btn-check"
-            id="synonym"
-            autocomplete="off"
-            value="synonym"
-            v-model="colOnOff"
-          />
-          <label class="btn btn-sm btn-outline-primary" for="synonym">Synonym</label>
-          <input
-            type="checkbox"
-            class="btn-check"
-            id="antonym"
-            autocomplete="off"
-            value="antonym"
-            v-model="colOnOff"
-          />
-          <label class="btn btn-sm btn-outline-primary" for="antonym">Antonym</label>
         </div>
       </div>
       <div>
           <input type="date" id="date_data" class="form-control" v-model="date_data">
-          {{ date_data }}
       </div>
       <div>
         <button type="button" @click="shuffle()" class="btn btn-success btn-sm me-2">Randomize Table</button>
@@ -56,14 +37,12 @@
         >Add Word</button>
       </div>
     </div>
-    <table class="table table-dark table-bordered rounded overflow-hidden">
+    <table class="table table-dark table-bordered table-striped rounded overflow-hidden table-sm">
       <thead>
         <tr>
-          <th>SL</th>
+          <th width="60">SL</th>
           <th v-if="colOnOff.includes('english')">English</th>
           <th v-if="colOnOff.includes('bangla')">Bangla</th>
-          <th v-if="colOnOff.includes('synonym')">Synonym</th>
-          <th v-if="colOnOff.includes('antonym')">Antonym</th>
         </tr>
       </thead>
       <tbody>
@@ -71,8 +50,6 @@
           <td>{{ index + 1 }}</td>
           <td v-if="colOnOff.includes('english')">{{ word.en_word }}</td>
           <td v-if="colOnOff.includes('bangla')">{{ word.bn_meaning }}</td>
-          <td v-if="colOnOff.includes('synonym')">{{ word.synonym }}</td>
-          <td v-if="colOnOff.includes('antonym')">{{ word.antonym }}</td>
         </tr>
       </tbody>
     </table>
@@ -101,14 +78,6 @@
                 <label class="form-label">Bangla Meaning</label>
                 <input type="text" class="form-control" v-model="wordForm.bn_meaning" />
               </div>
-              <div class="form-group">
-                <label class="form-label">Synonyms</label>
-                <input type="text" class="form-control" v-model="wordForm.synonym" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Antonyms</label>
-                <input type="text" class="form-control" v-model="wordForm.antonym" />
-              </div>
             </div>
             <div class="modal-footer">
               <button type="button" ref="Close" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -126,9 +95,18 @@ export default {
   data() {
     return {
       words: [],
-      colOnOff: ["english", "bangla", "synonym", "antonym"],
+      mainWords: [],
+      colOnOff: ["english", "bangla"],
       wordForm: {},
       date_data: null
+    }
+  },
+  watch: {
+    date_data(value) {
+      let wordsByDate = this.mainWords.filter(word => {
+        return this.isSameDay(new Date(word.created_at), new Date(value));
+      });
+      this.words = wordsByDate;
     }
   },
   methods: {
@@ -147,11 +125,17 @@ export default {
       this.axios.get('https://nextech.readyeshop.com/api/vocs')
         .then(res => {
           this.words = res.data.data;
+          this.mainWords = res.data.data;
         })
         .catch(function (error) {
           console.dir(error);
         });
 
+    },
+    isSameDay(d1, d2) {
+      return d1.getFullYear() === d2.getFullYear() &&
+        d1.getDate() === d2.getDate() &&
+        d1.getMonth() === d2.getMonth();
     },
     addWord() {
       this.axios.post('https://nextech.readyeshop.com/api/vocs',this.wordForm)
@@ -167,7 +151,6 @@ export default {
     },
   },
   mounted() {
-    // methods can be called in lifecycle hooks, or other methods!
     this.getWords()
   }
 }
